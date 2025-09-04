@@ -116,7 +116,7 @@ const LandMapping = () => {
     const parcelData = {
       farmerId,
       coordinates,
-      area: parseFloat(area.toFixed(2)), // Ensure it's a number, not a string
+      area: parseFloat(area.toFixed(2)),
       cropType,
     };
 
@@ -178,13 +178,10 @@ const LandMapping = () => {
     ) {
       createPolygonAndCalculateArea(demoCoords);
     } else {
-      // Fallback: set area manually if geometry library isn't available
       setArea(2.45);
       setCoordinates(demoCoords);
     }
   };
-
-  // Test backend connection on component mount
   useEffect(() => {
     const testBackend = async () => {
       try {
@@ -197,7 +194,6 @@ const LandMapping = () => {
         console.error("Backend connection test failed:", error);
       }
     };
-
     testBackend();
   }, []);
 

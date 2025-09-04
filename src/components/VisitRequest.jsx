@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 const VisitRequest = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch initial notifications
   useEffect(() => {
     fetchNotifications();
     setupEventSource();
@@ -35,8 +33,6 @@ const VisitRequest = () => {
       try {
         const newNotification = JSON.parse(event.data);
         setNotifications((prev) => [newNotification, ...prev]);
-
-        // Show browser notification if permitted
         if (Notification.permission === "granted") {
           new Notification("New Visit Request", {
             body: `From: ${newNotification.farmerName} (${newNotification.village})`,
@@ -50,7 +46,6 @@ const VisitRequest = () => {
     eventSource.onerror = (error) => {
       console.error("EventSource error:", error);
       eventSource.close();
-      // Attempt to reconnect after 5 seconds
       setTimeout(setupEventSource, 5000);
     };
 
