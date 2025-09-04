@@ -60,7 +60,6 @@ const LandMapping = () => {
       polygon.setMap(null);
     }
 
-    // Check if Google Maps geometry library is available
     if (!window.google || !window.google.maps || !window.google.maps.geometry) {
       console.error("Google Maps geometry library not available");
       return;
@@ -133,6 +132,7 @@ const LandMapping = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(parcelData),
+          mode: "cors",
         }
       );
 
