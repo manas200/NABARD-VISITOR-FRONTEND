@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+
 const LIBRARIES = ["geometry"];
 
 const mapContainerStyle = {
@@ -22,6 +23,8 @@ const LandMapping = () => {
   const [map, setMap] = useState(null);
   const [clickedPoints, setClickedPoints] = useState([]);
   const [polygon, setPolygon] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCbsHRudpggcTfqJGa7Lfq--vSEeMn6Mkk",
     libraries: LIBRARIES,
@@ -30,9 +33,6 @@ const LandMapping = () => {
   useEffect(() => {
     if (loadError) {
       console.error("Google Maps loading error:", loadError);
-      alert(
-        "Google Maps failed to load. Please check the browser console for details."
-      );
     }
   }, [loadError]);
 
@@ -59,21 +59,35 @@ const LandMapping = () => {
     if (polygon) {
       polygon.setMap(null);
     }
-    const newPolygon = new window.google.maps.Polygon({
-      paths: points,
-      strokeColor: "#1e6e3d",
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: "#2c974b",
-      fillOpacity: 0.35,
-    });
-    newPolygon.setMap(map);
-    setPolygon(newPolygon);
-    const area =
-      window.google.maps.geometry.spherical.computeArea(newPolygon.getPath()) /
-      10000;
-    setArea(area);
-    setCoordinates(points);
+
+    // Check if Google Maps geometry library is available
+    if (!window.google || !window.google.maps || !window.google.maps.geometry) {
+      console.error("Google Maps geometry library not available");
+      return;
+    }
+
+    try {
+      const newPolygon = new window.google.maps.Polygon({
+        paths: points,
+        strokeColor: "#1e6e3d",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#2c974b",
+        fillOpacity: 0.35,
+      });
+
+      newPolygon.setMap(map);
+      setPolygon(newPolygon);
+
+      const area =
+        window.google.maps.geometry.spherical.computeArea(
+          newPolygon.getPath()
+        ) / 10000;
+      setArea(area);
+      setCoordinates(points);
+    } catch (error) {
+      console.error("Error creating polygon:", error);
+    }
   };
 
   const resetDrawing = () => {
@@ -91,22 +105,28 @@ const LandMapping = () => {
       alert("Please complete all farmer information fields.");
       return;
     }
+
     if (coordinates.length < 3) {
       alert(
         "Please select at least 3 points on the map to define your land parcel."
       );
       return;
     }
+
     const parcelData = {
       farmerId,
       coordinates,
-      area,
+      area: parseFloat(area.toFixed(2)), // Ensure it's a number, not a string
       cropType,
     };
 
+    console.log("Sending data:", parcelData);
+
+    setIsSaving(true);
+
     try {
       const response = await fetch(
-        "http://localhost:5000/api/receive-coordinates",
+        "https://nabard-visitor-backend.onrender.com/api/receive-coordinates",
         {
           method: "POST",
           headers: {
@@ -116,19 +136,23 @@ const LandMapping = () => {
         }
       );
 
+      const responseData = await response.json();
+      console.log("Response:", responseData);
+
       if (response.ok) {
-        const result = await response.json();
         alert(
           `Land data saved successfully!\n\nArea: ${area.toFixed(
             2
           )} Hectares\nFarmer: ${farmerName}\nFarmer ID: ${farmerId}`
         );
       } else {
-        alert("Error saving land data. Please try again.");
+        alert(`Error: ${responseData.error || "Failed to save data"}`);
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error saving land data. Please check your connection.");
+      console.error("Network error:", error);
+      alert("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -139,17 +163,43 @@ const LandMapping = () => {
     setCropType("agroforestry");
 
     const demoCoords = [
-      { lat: 15.4865, lng: 75.117 },
-      { lat: 15.484, lng: 75.1195 },
-      { lat: 15.481, lng: 75.1175 },
-      { lat: 15.483, lng: 75.114 },
+      { lat: 23.215451, lng: 77.410072 },
+      { lat: 23.216, lng: 77.411 },
+      { lat: 23.214, lng: 77.411 },
+      { lat: 23.214, lng: 77.409 },
     ];
 
     setClickedPoints(demoCoords);
-    if (map) {
+    if (
+      map &&
+      window.google &&
+      window.google.maps &&
+      window.google.maps.geometry
+    ) {
       createPolygonAndCalculateArea(demoCoords);
+    } else {
+      // Fallback: set area manually if geometry library isn't available
+      setArea(2.45);
+      setCoordinates(demoCoords);
     }
   };
+
+  // Test backend connection on component mount
+  useEffect(() => {
+    const testBackend = async () => {
+      try {
+        const response = await fetch(
+          "https://nabard-visitor-backend.onrender.com/api/test"
+        );
+        const result = await response.json();
+        console.log("Backend test result:", result);
+      } catch (error) {
+        console.error("Backend connection test failed:", error);
+      }
+    };
+
+    testBackend();
+  }, []);
 
   if (loadError) {
     return (
@@ -169,32 +219,13 @@ const LandMapping = () => {
             }}
           >
             <h3>Google Maps API Error</h3>
-            <p>There's an issue with your Google Maps API key.</p>
-            <p>Please check:</p>
-            <ul style={{ textAlign: "left", margin: "10px 0" }}>
-              <li>API key is valid and enabled</li>
-              <li>Maps JavaScript API is enabled</li>
-              <li>Billing is set up for your Google Cloud project</li>
-            </ul>
+            <p>Please check your API key configuration.</p>
             <button
               onClick={() => window.location.reload()}
               style={{ marginTop: "15px", padding: "10px 20px" }}
             >
               Reload Page
             </button>
-          </div>
-        </div>
-        <div className="info-panel">
-          <div className="panel-content">
-            <div className="panel-section">
-              <h2>Instructions</h2>
-              <div className="instructions">
-                <p>
-                  Google Maps is currently unavailable due to API configuration
-                  issues.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -261,11 +292,13 @@ const LandMapping = () => {
             <h2>Instructions</h2>
             <div className="instructions">
               <ol>
-                <li>Zoom and pan the map to locate your land parcel</li>
-                <li>Click on the map to place points around the boundary</li>
+                <li>
+                  Click on the map to place points around your land boundary
+                </li>
                 <li>Click at least 3 points to define your land</li>
                 <li>The area will be automatically calculated</li>
-                <li>Click "Save Parcel" to store the information</li>
+                <li>Fill in your information below</li>
+                <li>Click "Save Parcel" to send data to the server</li>
               </ol>
             </div>
           </div>
@@ -340,9 +373,9 @@ const LandMapping = () => {
 
             <button
               onClick={handleSaveParcel}
-              disabled={clickedPoints.length < 3}
+              disabled={clickedPoints.length < 3 || isSaving}
             >
-              Save Parcel
+              {isSaving ? "Saving..." : "Save Parcel"}
             </button>
             <button className="secondary" onClick={simulateDemoFarm}>
               Simulate Demo Farm

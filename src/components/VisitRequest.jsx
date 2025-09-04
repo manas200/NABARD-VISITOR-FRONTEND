@@ -12,7 +12,9 @@ const VisitRequest = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/notifications");
+      const response = await fetch(
+        "https://nabard-visitor-backend.onrender.com/api/notifications"
+      );
       if (response.ok) {
         const data = await response.json();
         setNotifications(data);
@@ -26,7 +28,7 @@ const VisitRequest = () => {
 
   const setupEventSource = () => {
     const eventSource = new EventSource(
-      "http://localhost:5000/api/notifications/stream"
+      "https://nabard-visitor-backend.onrender.com/api/notifications/stream"
     );
 
     eventSource.onmessage = (event) => {
@@ -58,7 +60,7 @@ const VisitRequest = () => {
   const updateNotificationStatus = async (id, status) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/notifications/${id}`,
+        `https://nabard-visitor-backend.onrender.com/api/notifications/${id}`,
         {
           method: "PATCH",
           headers: {
