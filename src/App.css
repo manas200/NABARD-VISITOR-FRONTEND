@@ -1,0 +1,295 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f5f7f9;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: linear-gradient(135deg, #2c974b, #1e6e3d);
+  color: white;
+  padding: 20px 0;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  flex: 1;
+}
+
+.tabs {
+  display: flex;
+  background: #f0f5f1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+  padding: 15px 25px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #4b5563;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  color: #2c974b;
+  border-bottom: 3px solid #2c974b;
+  background: white;
+}
+
+.main-content {
+  display: flex;
+  min-height: 500px;
+  flex: 1;
+}
+
+.map-container {
+  flex: 7;
+  position: relative;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+  background: #e9ecef;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(
+    45deg,
+    #f0f5f1 25%,
+    #e9ecef 25%,
+    #e9ecef 50%,
+    #f0f5f1 50%,
+    #f0f5f1 75%,
+    #e9ecef 75%,
+    #e9ecef 100%
+  );
+  background-size: 20px 20px;
+}
+
+.info-panel {
+  flex: 3;
+  padding: 25px;
+  background: #f9fafb;
+  border-left: 1px solid #e5e7eb;
+  overflow-y: auto;
+}
+
+.panel-section {
+  margin-bottom: 25px;
+}
+
+h2 {
+  font-size: 1.4rem;
+  color: #2c974b;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+h3 {
+  font-size: 1.1rem;
+  color: #4b5563;
+  margin-bottom: 12px;
+}
+
+.instructions {
+  background: #edf7ef;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.instructions ol {
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin-bottom: 8px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #374151;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+button {
+  background: #2c974b;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.3s;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #1e6e3d;
+}
+
+button.secondary {
+  background: #6b7280;
+}
+
+button.secondary:hover {
+  background: #4b5563;
+}
+
+.coordinates-box {
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+  max-height: 150px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.result-box {
+  background: #e6f4ea;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.area-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2c974b;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.controls button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
+}
+
+.map-overlay h3 {
+  margin-bottom: 10px;
+  color: #2c974b;
+}
+
+.notification {
+  background: #fef3cd;
+  border: 1px solid #fde68a;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.notification h3 {
+  color: #92400e;
+  margin-bottom: 10px;
+}
+
+.notification p {
+  margin-bottom: 10px;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  font-size: 0.9rem;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .map-container {
+    height: 400px;
+  }
+
+  .info-panel {
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+  }
+}
